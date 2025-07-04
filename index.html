@@ -3,29 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <title>Exemplo de Parâmetros</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        
+        #titulo {
+            margin: 0 0 20px 0;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        #powerbi-iframe {
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
 </head>
-<body>
-    <h1 id="titulo">Esprerando...</h1>
-    <script>
-    // Captura os parâmetros da URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const id_empreendimento = urlParams.get('id_empreendimento');
+    <body>
+        <h1 id="titulo">Esprerando...</h1>
+        <script>
+        // Captura os parâmetros da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const id_empreendimento = urlParams.get('id_empreendimento');
 
-    // Usa os parâmetros dinamicamente
-    document.getElementById('titulo').textContent = `id_empreendimento: ${id_empreendimento}`;
+        // Usa os parâmetros dinamicamente
+        document.getElementById('titulo').textContent = `id_empreendimento: ${id_empreendimento}`;
 
-    // Você pode fazer muito mais aqui:
-    // - carregar um gráfico
-    // - disparar uma requisição fetch
-    // - gerar um link para Power BI com filtros aplicados
-    </script>
-    <iframe 
-        title="Resumo Carteira PELT -  GEO - Corredores e Priorização - 2.0" 
-        width="600" 
-        height="373.5" 
-        src="https://app.powerbi.com/view?r=eyJrIjoiN2RmNTdlYWItOWJjMi00YjE2LThhZjYtZDhmZmNlM2Y4YTI4IiwidCI6ImZjNWJlNzgyLWM2MTktNGM2Ni05M2ExLWExNmNiMjNjMzhmOSJ9&pageName=4ed15a60a7e9c1b03cb0" 
-        frameborder="0" 
-        allowFullScreen="true">
-    </iframe>
-</body>
+        // Função para ajustar o iframe para tela cheia
+        function ajustarIframeTelaCheio() {
+            const iframe = document.getElementById('powerbi-iframe');
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+            
+            // Ajusta as dimensões do iframe para ocupar toda a tela
+            iframe.width = screenWidth;
+            iframe.height = screenHeight - 100; // Subtrai 100px para deixar espaço para o título
+            
+            console.log(`Dimensões da tela: ${screenWidth}x${screenHeight}`);
+            console.log(`Iframe ajustado para: ${iframe.width}x${iframe.height}`);
+        }
+
+        // Executa quando a página carrega
+        window.addEventListener('load', ajustarIframeTelaCheio);
+        
+        // Reajusta quando a janela é redimensionada
+        window.addEventListener('resize', ajustarIframeTelaCheio);
+
+        // Você pode fazer muito mais aqui:
+        // - carregar um gráfico
+        // - disparar uma requisição fetch
+        // - gerar um link para Power BI com filtros aplicados
+        </script>
+        <iframe 
+            id="powerbi-iframe"
+            title="Resumo Carteira PELT -  GEO - Corredores e Priorização - 2.0" 
+            width="600" 
+            height="373.5" 
+            src="https://app.powerbi.com/view?r=eyJrIjoiN2RmNTdlYWItOWJjMi00YjE2LThhZjYtZDhmZmNlM2Y4YTI4IiwidCI6ImZjNWJlNzgyLWM2MTktNGM2Ni05M2ExLWExNmNiMjNjMzhmOSJ9&pageName=4ed15a60a7e9c1b03cb0" 
+            frameborder="0" 
+            allowFullScreen="true">
+        </iframe>
+    </body>
 </html>
