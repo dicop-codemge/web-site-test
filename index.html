@@ -28,6 +28,39 @@
 </head>
     <body>
         <h1 id="titulo">Esprerando...</h1>
+        
+        <!-- Botões para testar os cliques -->
+        <div style="margin-bottom: 20px; text-align: center;">
+            <button onclick="clicarElementoPowerBI('[aria-label=`id_empreendimento`]')" style="margin: 5px; padding: 10px 20px; background-color: #007acc; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Clicar Filtro
+            </button>
+            <button onclick="clicarElementoPowerBI('grafico')" style="margin: 5px; padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Clicar Gráfico
+            </button>
+            <button onclick="clicarElementoPowerBI('botao-direito')" style="margin: 5px; padding: 10px 20px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Clicar Direita
+            </button>
+            <button onclick="automacaoCliques()" style="margin: 5px; padding: 10px 20px; background-color: #6f42c1; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Automação
+            </button>
+        </div>
+        
+        <!-- Botões para controlar o rastreamento do mouse -->
+        <div style="margin-bottom: 20px; text-align: center;">
+            <button onclick="iniciarRastreamentoMouse()" style="margin: 5px; padding: 8px 16px; background-color: #17a2b8; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                🖱️ Iniciar Rastreamento
+            </button>
+            <button onclick="pararRastreamentoMouse()" style="margin: 5px; padding: 8px 16px; background-color: #6c757d; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                ⏹️ Parar Rastreamento
+            </button>
+            <button onclick="console.clear()" style="margin: 5px; padding: 8px 16px; background-color: #ffc107; color: black; border: none; border-radius: 3px; cursor: pointer;">
+                🧹 Limpar Console
+            </button>
+        </div>
+        
+        <div style="margin-bottom: 10px; text-align: center; font-size: 12px; color: #666;">
+            <strong>Atalhos:</strong> Ctrl+1 (Filtro) | Ctrl+2 (Gráfico) | Ctrl+3 (Direita) | Ctrl+0 (Automação) | <strong>Ctrl+M (Toggle Mouse)</strong>
+        </div>
         <script>
         // Captura os parâmetros da URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -56,6 +89,174 @@
         // Reajusta quando a janela é redimensionada
         window.addEventListener('resize', ajustarIframeTelaCheio);
 
+        // Função para fazer cliques no Power BI (contorna o cross-origin)
+        function clicarNoPowerBI(x, y) {
+            const iframe = document.getElementById('powerbi-iframe');
+            
+            // Cria um evento de clique simulado
+            const clickEvent = new MouseEvent('click', {
+                view: window,
+                bubbles: true,
+                cancelable: true,
+                clientX: x,
+                clientY: y
+            });
+            
+            // Simula o clique no iframe
+            iframe.dispatchEvent(clickEvent);
+            console.log(`Clique simulado em: x=${x}, y=${y}`);
+        }
+        
+        // Função para clicar em posições específicas do Power BI
+        function clicarElementoPowerBI(posicao) {
+            const iframe = document.getElementById('powerbi-iframe');
+            const rect = iframe.getBoundingClientRect();
+            
+            let x, y;
+            
+            switch(posicao) {
+                case 'filtro':
+                    x = rect.left + 50;  // Posição aproximada do filtro
+                    y = rect.top;
+                    break;
+                case 'grafico':
+                    x = rect.left + rect.width / 2;  // Centro do gráfico
+                    y = rect.top + rect.height / 2;
+                    break;
+                case 'botao-direito':
+                    x = rect.left + rect.width - 100;  // Lado direito
+                    y = rect.top + 50;
+                    break;
+                default:
+                    x = rect.left + 100;
+                    y = rect.top + 100;
+            }
+            
+            // Foca no iframe primeiro
+            iframe.focus();
+            
+            // Simula o clique
+            setTimeout(() => {
+                clicarNoPowerBI(x, y);
+            }, 100);
+        }
+        
+        // Função para automatizar cliques sequenciais
+        function automacaoCliques() {
+            console.log('Iniciando automação de cliques...');
+            
+            // Clique 1: Filtro (após 2 segundos)
+            setTimeout(() => {
+                clicarElementoPowerBI('filtro');
+            }, 2000);
+            
+            // Clique 2: Gráfico (após 4 segundos)
+            setTimeout(() => {
+                clicarElementoPowerBI('grafico');
+            }, 4000);
+            
+            // Clique 3: Botão direito (após 6 segundos)
+            setTimeout(() => {
+                clicarElementoPowerBI('botao-direito');
+            }, 6000);
+        }
+        
+        // Adiciona teclas de atalho para facilitar os testes
+        document.addEventListener('keydown', (event) => {
+            if (event.ctrlKey) {
+                switch(event.key) {
+                    case '1':
+                        event.preventDefault();
+                        clicarElementoPowerBI('filtro');
+                        break;
+                    case '2':
+                        event.preventDefault();
+                        clicarElementoPowerBI('grafico');
+                        break;
+                    case '3':
+                        event.preventDefault();
+                        clicarElementoPowerBI('botao-direito');
+                        break;
+                    case '0':
+                        event.preventDefault();
+                        automacaoCliques();
+                        break;
+                }
+            }
+        });
+        
+        // Script para mostrar posição do mouse no console
+        let mouseTracking = false;
+        
+        function iniciarRastreamentoMouse() {
+            mouseTracking = true;
+            console.log('🖱️ Rastreamento do mouse INICIADO');
+            console.log('Pressione Ctrl+M para parar o rastreamento');
+        }
+        
+        function pararRastreamentoMouse() {
+            mouseTracking = false;
+            console.log('🖱️ Rastreamento do mouse PARADO');
+        }
+        
+        // Evento para capturar movimento do mouse
+        document.addEventListener('mousemove', (event) => {
+            if (mouseTracking) {
+                const x = event.clientX;
+                const y = event.clientY;
+                console.log(`🖱️ Mouse: x=${x}, y=${y}`);
+                
+                // Verifica se o mouse está sobre o iframe
+                const iframe = document.getElementById('powerbi-iframe');
+                const rect = iframe.getBoundingClientRect();
+                
+                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                    const relativeX = x - rect.left;
+                    const relativeY = y - rect.top;
+                    console.log(`📊 Posição relativa no Power BI: x=${relativeX}, y=${relativeY}`);
+                }
+            }
+        });
+        
+        // Evento para capturar cliques e mostrar coordenadas
+        document.addEventListener('click', (event) => {
+            if (mouseTracking) {
+                const x = event.clientX;
+                const y = event.clientY;
+                console.log(`🎯 CLIQUE em: x=${x}, y=${y}`);
+                
+                // Verifica se o clique foi no iframe
+                const iframe = document.getElementById('powerbi-iframe');
+                const rect = iframe.getBoundingClientRect();
+                
+                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                    const relativeX = x - rect.left;
+                    const relativeY = y - rect.top;
+                    console.log(`🎯 CLIQUE no Power BI: x=${relativeX}, y=${relativeY}`);
+                    console.log(`💡 Para usar: clicarNoPowerBI(${x}, ${y})`);
+                }
+            }
+        });
+        
+        // Adiciona atalho para controlar o rastreamento
+        document.addEventListener('keydown', (event) => {
+            if (event.ctrlKey && event.key === 'm') {
+                event.preventDefault();
+                if (mouseTracking) {
+                    pararRastreamentoMouse();
+                } else {
+                    iniciarRastreamentoMouse();
+                }
+            }
+        });
+        
+        // Inicia o rastreamento automaticamente
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                iniciarRastreamentoMouse();
+            }, 1000);
+        });
+        
         // Você pode fazer muito mais aqui:
         // - carregar um gráfico
         // - disparar uma requisição fetch
