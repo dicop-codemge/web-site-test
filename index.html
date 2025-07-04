@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Exemplo de Parâmetros</title>
+</head>
+<body>
+  <h1 id="titulo">Carregando...</h1>
+
+  <script>
+    // Captura os parâmetros da URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const setor = urlParams.get('setor');
+    const obra = urlParams.get('obra');
+
+    // Usa os parâmetros dinamicamente
+    document.getElementById('titulo').textContent = `Exibindo dados da obra ${obra} no setor ${setor}`;
+
+    // Você pode fazer muito mais aqui:
+    // - carregar um gráfico
+    // - disparar uma requisição fetch
+    // - gerar um link para Power BI com filtros aplicados
+  </script>
+</body>
+</html>
