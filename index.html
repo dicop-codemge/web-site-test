@@ -2,274 +2,194 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Exemplo de Parâmetros</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power BI - Visualização de Empreendimentos</title>
     <style>
-        body {
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .instrucao-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             padding: 20px;
-            font-family: Arial, sans-serif;
-        }
-        
-        #titulo {
-            margin: 0 0 20px 0;
-            padding: 10px;
-            background-color: #f0f0f0;
-            border-radius: 5px;
             text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
         }
-        
+
+        .instrucao-texto {
+            font-size: 18px;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            line-height: 1.4;
+        }
+
+        .empreendimento-id {
+            display: inline-block;
+            background-color: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: #ffeb3b;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .powerbi-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            background-color: #ffffff;
+            position: relative;
+        }
+
         #powerbi-iframe {
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            display: block;
-            margin: 0 auto;
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: white;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #666;
+            font-size: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .instrucao-texto {
+                font-size: 16px;
+            }
+            
+            .instrucao-container {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .instrucao-texto {
+                font-size: 14px;
+            }
+            
+            .instrucao-container {
+                padding: 12px;
+            }
         }
     </style>
 </head>
-    <body>
-        <h1 id="titulo">Esprerando...</h1>
-        
-        <!-- Botões para testar os cliques -->
-        <div style="margin-bottom: 20px; text-align: center;">
-            <button onclick="clicarElementoPowerBI('[aria-label=`id_empreendimento`]')" style="margin: 5px; padding: 10px 20px; background-color: #007acc; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                Clicar Filtro
-            </button>
-            <button onclick="clicarElementoPowerBI('grafico')" style="margin: 5px; padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                Clicar Gráfico
-            </button>
-            <button onclick="clicarElementoPowerBI('botao-direito')" style="margin: 5px; padding: 10px 20px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                Clicar Direita
-            </button>
-            <button onclick="automacaoCliques()" style="margin: 5px; padding: 10px 20px; background-color: #6f42c1; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                Automação
-            </button>
+<body>
+    <div class="instrucao-container">
+        <div class="instrucao-texto" id="instrucao-texto">
+            Carregando instruções...
         </div>
-        
-        <!-- Botões para controlar o rastreamento do mouse -->
-        <div style="margin-bottom: 20px; text-align: center;">
-            <button onclick="iniciarRastreamentoMouse()" style="margin: 5px; padding: 8px 16px; background-color: #17a2b8; color: white; border: none; border-radius: 3px; cursor: pointer;">
-                🖱️ Iniciar Rastreamento
-            </button>
-            <button onclick="pararRastreamentoMouse()" style="margin: 5px; padding: 8px 16px; background-color: #6c757d; color: white; border: none; border-radius: 3px; cursor: pointer;">
-                ⏹️ Parar Rastreamento
-            </button>
-            <button onclick="console.clear()" style="margin: 5px; padding: 8px 16px; background-color: #ffc107; color: black; border: none; border-radius: 3px; cursor: pointer;">
-                🧹 Limpar Console
-            </button>
+    </div>
+
+    <div class="powerbi-container">
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>Carregando Power BI...</div>
         </div>
-        
-        <div style="margin-bottom: 10px; text-align: center; font-size: 12px; color: #666;">
-            <strong>Atalhos:</strong> Ctrl+1 (Filtro) | Ctrl+2 (Gráfico) | Ctrl+3 (Direita) | Ctrl+0 (Automação) | <strong>Ctrl+M (Toggle Mouse)</strong>
-        </div>
-        <script>
-        // Captura os parâmetros da URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const id_empreendimento = urlParams.get('id_empreendimento');
-
-        // Usa os parâmetros dinamicamente
-        document.getElementById('titulo').textContent = `id_empreendimento: ${id_empreendimento}`;
-
-        // Função para ajustar o iframe para tela cheia
-        function ajustarIframeTelaCheio() {
-            const iframe = document.getElementById('powerbi-iframe');
-            const screenWidth = window.innerWidth;
-            const screenHeight = window.innerHeight;
-            
-            // Ajusta as dimensões do iframe para ocupar toda a tela
-            iframe.width = screenWidth;
-            iframe.height = screenHeight - 100; // Subtrai 100px para deixar espaço para o título
-            
-            console.log(`Dimensões da tela: ${screenWidth}x${screenHeight}`);
-            console.log(`Iframe ajustado para: ${iframe.width}x${iframe.height}`);
-        }
-
-        // Executa quando a página carrega
-        window.addEventListener('load', ajustarIframeTelaCheio);
-        
-        // Reajusta quando a janela é redimensionada
-        window.addEventListener('resize', ajustarIframeTelaCheio);
-
-        // Função para fazer cliques no Power BI (contorna o cross-origin)
-        function clicarNoPowerBI(x, y) {
-            const iframe = document.getElementById('powerbi-iframe');
-            
-            // Cria um evento de clique simulado
-            const clickEvent = new MouseEvent('click', {
-                view: window,
-                bubbles: true,
-                cancelable: true,
-                clientX: x,
-                clientY: y
-            });
-            
-            // Simula o clique no iframe
-            iframe.dispatchEvent(clickEvent);
-            console.log(`Clique simulado em: x=${x}, y=${y}`);
-        }
-        
-        // Função para clicar em posições específicas do Power BI
-        function clicarElementoPowerBI(posicao) {
-            const iframe = document.getElementById('powerbi-iframe');
-            const rect = iframe.getBoundingClientRect();
-            
-            let x, y;
-            
-            switch(posicao) {
-                case 'filtro':
-                    x = rect.left + 50;  // Posição aproximada do filtro
-                    y = rect.top;
-                    break;
-                case 'grafico':
-                    x = rect.left + rect.width / 2;  // Centro do gráfico
-                    y = rect.top + rect.height / 2;
-                    break;
-                case 'botao-direito':
-                    x = rect.left + rect.width - 100;  // Lado direito
-                    y = rect.top + 50;
-                    break;
-                default:
-                    x = rect.left + 100;
-                    y = rect.top + 100;
-            }
-            
-            // Foca no iframe primeiro
-            iframe.focus();
-            
-            // Simula o clique
-            setTimeout(() => {
-                clicarNoPowerBI(x, y);
-            }, 100);
-        }
-        
-        // Função para automatizar cliques sequenciais
-        function automacaoCliques() {
-            console.log('Iniciando automação de cliques...');
-            
-            // Clique 1: Filtro (após 2 segundos)
-            setTimeout(() => {
-                clicarElementoPowerBI('filtro');
-            }, 2000);
-            
-            // Clique 2: Gráfico (após 4 segundos)
-            setTimeout(() => {
-                clicarElementoPowerBI('grafico');
-            }, 4000);
-            
-            // Clique 3: Botão direito (após 6 segundos)
-            setTimeout(() => {
-                clicarElementoPowerBI('botao-direito');
-            }, 6000);
-        }
-        
-        // Adiciona teclas de atalho para facilitar os testes
-        document.addEventListener('keydown', (event) => {
-            if (event.ctrlKey) {
-                switch(event.key) {
-                    case '1':
-                        event.preventDefault();
-                        clicarElementoPowerBI('filtro');
-                        break;
-                    case '2':
-                        event.preventDefault();
-                        clicarElementoPowerBI('grafico');
-                        break;
-                    case '3':
-                        event.preventDefault();
-                        clicarElementoPowerBI('botao-direito');
-                        break;
-                    case '0':
-                        event.preventDefault();
-                        automacaoCliques();
-                        break;
-                }
-            }
-        });
-        
-        // Script para mostrar posição do mouse no console
-        let mouseTracking = false;
-        
-        function iniciarRastreamentoMouse() {
-            mouseTracking = true;
-            console.log('🖱️ Rastreamento do mouse INICIADO');
-            console.log('Pressione Ctrl+M para parar o rastreamento');
-        }
-        
-        function pararRastreamentoMouse() {
-            mouseTracking = false;
-            console.log('🖱️ Rastreamento do mouse PARADO');
-        }
-        
-        // Evento para capturar movimento do mouse
-        document.addEventListener('mousemove', (event) => {
-            if (mouseTracking) {
-                const x = event.clientX;
-                const y = event.clientY;
-                console.log(`🖱️ Mouse: x=${x}, y=${y}`);
-                
-                // Verifica se o mouse está sobre o iframe
-                const iframe = document.getElementById('powerbi-iframe');
-                const rect = iframe.getBoundingClientRect();
-                
-                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-                    const relativeX = x - rect.left;
-                    const relativeY = y - rect.top;
-                    console.log(`📊 Posição relativa no Power BI: x=${relativeX}, y=${relativeY}`);
-                }
-            }
-        });
-        
-        // Evento para capturar cliques e mostrar coordenadas
-        document.addEventListener('click', (event) => {
-            if (mouseTracking) {
-                const x = event.clientX;
-                const y = event.clientY;
-                console.log(`🎯 CLIQUE em: x=${x}, y=${y}`);
-                
-                // Verifica se o clique foi no iframe
-                const iframe = document.getElementById('powerbi-iframe');
-                const rect = iframe.getBoundingClientRect();
-                
-                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-                    const relativeX = x - rect.left;
-                    const relativeY = y - rect.top;
-                    console.log(`🎯 CLIQUE no Power BI: x=${relativeX}, y=${relativeY}`);
-                    console.log(`💡 Para usar: clicarNoPowerBI(${x}, ${y})`);
-                }
-            }
-        });
-        
-        // Adiciona atalho para controlar o rastreamento
-        document.addEventListener('keydown', (event) => {
-            if (event.ctrlKey && event.key === 'm') {
-                event.preventDefault();
-                if (mouseTracking) {
-                    pararRastreamentoMouse();
-                } else {
-                    iniciarRastreamentoMouse();
-                }
-            }
-        });
-        
-        // Inicia o rastreamento automaticamente
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                iniciarRastreamentoMouse();
-            }, 1000);
-        });
-        
-        // Você pode fazer muito mais aqui:
-        // - carregar um gráfico
-        // - disparar uma requisição fetch
-        // - gerar um link para Power BI com filtros aplicados
-        </script>
         <iframe 
             id="powerbi-iframe"
-            title="Resumo Carteira PELT -  GEO - Corredores e Priorização - 2.0" 
-            width="600" 
-            height="373.5" 
-            src="https://app.powerbi.com/view?r=eyJrIjoiN2RmNTdlYWItOWJjMi00YjE2LThhZjYtZDhmZmNlM2Y4YTI4IiwidCI6ImZjNWJlNzgyLWM2MTktNGM2Ni05M2ExLWExNmNiMjNjMzhmOSJ9&pageName=4ed15a60a7e9c1b03cb0" 
-            frameborder="0" 
-            allowFullScreen="true">
+            title="Power BI Dashboard - Empreendimentos" 
+            src="https://app.powerbi.com/view?r=eyJrIjoiN2RmNTdlYWItOWJjMi00YjE2LThhZjYtZDhmZmNlM2Y4YTI4IiwidCI6ImZjNWJlNzgyLWM2MTktNGM2Ni05M2ExLWExNmNiMjNjMzhmOSJ9&pageName=4ed15a60a7e9c1b03cb0"
+            allowfullscreen="true">
         </iframe>
-    </body>
+    </div>
+
+    <script>
+        // Captura o parâmetro id_empreendimento da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const idEmpreendimento = urlParams.get('id_empreendimento');
+        
+        // Elemento da instrução
+        const instrucaoTexto = document.getElementById('instrucao-texto');
+        
+        // Define a instrução baseada no parâmetro
+        function definirInstrucao() {
+            if (idEmpreendimento) {
+                instrucaoTexto.innerHTML = `
+                    Para ver o empreendimento desejado clique no filtro <strong>empreendimento</strong> abaixo no Power BI e selecione o empreendimento de ID <span class="empreendimento-id">${idEmpreendimento}</span>
+                `;
+            } else {
+                instrucaoTexto.innerHTML = `
+                    Utilize os filtros do Power BI abaixo para visualizar os dados dos empreendimentos disponíveis
+                `;
+            }
+        }
+        
+        // Configura título da página
+        function configurarTitulo() {
+            if (idEmpreendimento) {
+                document.title = `Power BI - Empreendimento ${idEmpreendimento}`;
+            }
+        }
+        
+        // Monitora carregamento do iframe
+        function monitorarCarregamento() {
+            const iframe = document.getElementById('powerbi-iframe');
+            const loading = document.getElementById('loading');
+            
+            iframe.onload = function() {
+                // Esconde loading quando carregado
+                setTimeout(() => {
+                    loading.style.display = 'none';
+                }, 1000);
+                console.log('Power BI carregado com sucesso');
+            };
+            
+            iframe.onerror = function() {
+                loading.innerHTML = '<div style="color: #dc3545;">Erro ao carregar Power BI. Tente recarregar a página.</div>';
+            };
+        }
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            definirInstrucao();
+            configurarTitulo();
+            monitorarCarregamento();
+            
+            console.log('Sistema iniciado');
+            if (idEmpreendimento) {
+                console.log(`ID do empreendimento: ${idEmpreendimento}`);
+            }
+        });
+        
+        // Log para debug
+        console.log('Power BI Viewer carregado');
+    </script>
+</body>
 </html>
