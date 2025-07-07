@@ -22,7 +22,7 @@
         .instrucao-container {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 20px;
+            padding: 5px;
             text-align: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             position: relative;
@@ -145,16 +145,14 @@
                     Para ver o empreendimento desejado clique no filtro <strong>empreendimento</strong> abaixo no Power BI e selecione o empreendimento de ID <span class="empreendimento-id">${idEmpreendimento}</span>
                 `;
             } else {
-                instrucaoTexto.innerHTML = `
-                    Utilize os filtros do Power BI abaixo para visualizar os dados dos empreendimentos disponíveis
-                `;
+                instrucaoTexto.innerHTML = ``;
             }
         }
         
         // Configura título da página
         function configurarTitulo() {
             if (idEmpreendimento) {
-                document.title = `Power BI - Empreendimento ${idEmpreendimento}`;
+                document.title = `Empreendimento ${idEmpreendimento}`;
             }
         }
         
